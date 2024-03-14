@@ -44,7 +44,66 @@ def start_activity(type_of):
 	time.sleep(2)
 	main()
 
-def statistic():
+def statistic_dbd():
+	cls()
+	if os.stat("settings.ini").st_size == 0:
+		print("There isn't any statistic yet!")
+		time.sleep(2)
+		main()
+	picked = []
+	index = 0
+	try:
+		while True:
+			current_month = config[str(index)]["Start_time"][9:11]
+			if not current_month in picked:
+				picked.append(current_month)
+			index += 1
+	except:
+		pass
+	if len(picked) == 1:
+		month = picked[0]
+	else:
+		print("Choose the month: ")
+		index = 0
+		for element in picked:
+			print(f"[{index + 1}] - {element}")
+			index += 1
+		choose = int(input(">>> "))
+		month = picked[choose - 1]
+		picked = []
+		index = 0
+		try:
+			while True:
+				current_day = config[str(index)]["Start_time"][6:8]
+				temp_month = config[str(index)]["Start_time"][9:11]
+				if not current_day in picked and month == temp_month:
+					picked.append(current_day)
+				index += 1
+		except:
+			pass
+		print("Choose the day: ")
+		index = 0
+		for element in picked:
+			print(f"[{index + 1}] - {element}")
+			index += 1
+		choose = int(input(">>> "))
+		day = picked[choose - 1]
+		day_indexes = []
+		index = 0
+		try:
+			while True:
+				if config[str(index)]["Start_time"][6:8] == day and config[str(index)]["Start_time"][9:11] == month:
+					day_indexes.append(str(index))
+				index += 1
+		except:
+			pass
+		cls()
+		print(f"Statistic for {day}.{month}:")
+		
+	
+	
+
+def statistic_main():
 	cls()
 	months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 	is_first = True
@@ -76,10 +135,19 @@ def statistic():
 		print(f'  |     Start time - {config[str(element)]["Start_time"][0:5]}')
 		print(f'  |     End time - {config[str(element)]["End_time"][0:5]}')
 		print(f'  |     During - {during(config[str(element)]["End_time"], config[str(element)]["Start_time"])}')
+		print(f'  |     Percentage - {int(during(config[str(element)]["End_time"], config[str(element)]["Start_time"]) / datetime.timedelta(days=1) * 100)}% of 24H')
 		print("   ---------------------------------------------------")
 	print("Press any key to return to the main menu: ")
 	input(">>> ")
 	main()
+
+def statistic():
+	print("Do you want [D]ay by day or [M]ain statistic?")
+	choose = input(">>> ")
+	if choose == "D":
+		statistic_dbd()
+	else:
+		statistic_main()
 	
 
 def main():
@@ -110,9 +178,12 @@ def main():
 		for element in types:
 			print(f"[{index}] - {element}")
 			index+=1
+		print(f"[{index}] - EXIT")
 		choose = int(input(">>> "))
 		if choose == 0:
 			statistic()
+		elif choose == index:
+			quit(0)
 		else:
 			start_activity(types[choose - 1])
 	else:
