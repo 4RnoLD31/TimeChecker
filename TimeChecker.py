@@ -161,7 +161,7 @@ def statistic_main():
 		start_time = records[str(index)]["Start_time"][0:5]
 		end_time = records[str(index)]["End_time"][0:5]
 		during_var = during(records[str(index)]["End_time"], records[str(index)]["Start_time"])
-		percentage = round(during / datetime.timedelta(days=1) * 100, 2)
+		percentage = round(during_var / datetime.timedelta(days=1) * 100, 2)
 		print(f'  |   {records[str(index)]["Type"]}')
 		print(f'  |     Start time - {start_time}')
 		print(f'  |     End time - {end_time}')
