@@ -11,20 +11,36 @@ def cls():
 		os.system("clear")
 
 def set_time():
+	to_leave = False
 	print("Set time. Ex: 14:50, 03:34. Or use empty string to set current time")
 	while True:
 		time = input(">>> ")
 		if time == "":
 			time = datetime.datetime.now().strftime("%H:%M")
 			break
-		elif time[2] == ":" and len(time) == 5:
+		for element in time:
+			if not element.isdigit() and not element == ":":
+				to_leave = True
+				break
+		if to_leave:
+			to_leave = False
+			continue
+		elif len(time) == 5 and time[2] == ":":
 			break
 	print("Set date. Ex: 13.03.2024, 01.03.2024. Or use empty string to set current date")
 	while True:
 		date = input(">>> ")
 		if date == "":
 			date = datetime.datetime.now().strftime("%d.%m.%Y")
-		elif date[2] == "." and date[5] == "." and date[2] == "." and len(date) == 10:
+			break
+		for element in date:
+			if not element.isdigit() and not element == ".":
+				to_leave = True
+				break
+		if to_leave:
+			to_leave = False
+			continue
+		if len(date) == 10 and date[2] == "." and date[5] == "." and date[2] == ".":
 			break
 	print(f"Done. {time + ' ' + date}")
 	return time + " " + date
@@ -35,6 +51,7 @@ def during(first, second):
 	return first - second
 
 def start_activity(type_of):
+	cls()
 	start_time = set_time()
 	records[int(index_records) + 1] = {
 		"Type": type_of,
@@ -47,10 +64,6 @@ def start_activity(type_of):
 
 def statistic_dbd():
 	cls()
-	if index_records == "0":
-		print("There isn't any statistic yet!")
-		time.sleep(2)
-		main()
 	picked = []
 	index = 0
 	try:
@@ -128,10 +141,6 @@ def statistic_dbd():
 def statistic_main():
 	cls()
 	is_first = True
-	if index_records == "0":
-		print("There isn't any statistic yet!")
-		time.sleep(2)
-		main()
 	for index in range(0, int(index_records) + 1):
 		current_time = records[str(index)]["Start_time"][6:8]
 		current_month = records[str(index)]["Start_time"][9:11]
@@ -146,17 +155,26 @@ def statistic_main():
 			if is_first:
 				print("   ---------------------------------------------------")
 			is_first = False
+		start_time = records[str(index)]["Start_time"][0:5]
+		end_time = records[str(index)]["End_time"][0:5]
+		during = during(records[str(index)]["End_time"], records[str(index)]["Start_time"])
+		percentage = round(during / datetime.timedelta(days=1) * 100, 2)
 		print(f'  |   {records[str(index)]["Type"]}')
-		print(f'  |     Start time - {records[str(index)]["Start_time"][0:5]}')
-		print(f'  |     End time - {records[str(index)]["End_time"][0:5]}')
-		print(f'  |     During - {during(records[str(index)]["End_time"], records[str(index)]["Start_time"])}')
-		print(f'  |     Percentage - {int(during(records[str(index)]["End_time"], records[str(index)]["Start_time"]) / datetime.timedelta(days=1) * 100)}% of 24H')
+		print(f'  |     Start time - {start_time}')
+		print(f'  |     End time - {end_time}')
+		print(f'  |     During - {during}')
+		print(f'  |     Percentage - {percentage}% of 24H')
 		print("   ---------------------------------------------------")
 	print("Press any key to return to the main menu: ")
 	input(">>> ")
 	main()
 
 def statistic():
+	cls()
+	if index_records == "-1":
+		print("There isn't any statistic yet!")
+		time.sleep(2)
+		main()
 	print("Do you want [D]ay by day or [M]ain statistic?")
 	while True:
 		choose = input(">>> ")
@@ -179,29 +197,31 @@ def main():
 	records.read("records.ini")
 	index_records = 0
 	try:
+		records[str(index_records)]
 		while True:
-			records[str(index_records)]
 			index_records += 1
+			records[str(index_records)]
 	except:
-		pass
+		index_records -= 1
 	index_records = str(index_records)
-	if index_records == "0" or records[index_records]["End_time"] != "":
+	if index_records == "-1" or records[index_records]["End_time"] != "":
 		print("Choose the activity type: ")
-		print("[-1] - EXIT")
+		print("[E] - EXIT")
 		print("[0] - STATISTICS")
 		for index in range(len(types)):
 			print(f"[{index + 1}] - {types[index]}")
 		while True:
+			choose = input(">>> ")
+			if choose.lower() == "e":
+				quit(0)
 			try:
-				choose = int(input(">>> "))
-				if choose == -1:
-					quit(0)
-				elif choose == 0:
-					statistic()
-				elif choose <= len(types):
-					start_activity(types[choose - 1])
+				int(choose)
 			except:
-				pass
+				continue
+			if int(choose) == 0:
+				statistic()
+			elif int(choose) <= len(types):
+				start_activity(types[int(choose) - 1])
 	else:
 		print(f'Your last activity "{records[index_records]["Type"]} - {records[index_records]["Start_time"]}" is not end. Do you want to add End time? [Y/N]')
 		while True:
