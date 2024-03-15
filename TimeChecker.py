@@ -134,6 +134,9 @@ def statistic_dbd():
 		print(f"{element} - {type_time[element]} {int(type_time[element] / datetime.timedelta(hours=24) * 100)}%")
 		summary += type_time[element]
 	print(f"Other - {datetime.timedelta(hours=24) - summary} {int((datetime.timedelta(hours=24) - summary) / datetime.timedelta(hours=24) * 100)}%")
+	print("Press any key to return to the main menu: ")
+	input(">>> ")
+	main()
 		
 	
 	
@@ -157,12 +160,12 @@ def statistic_main():
 			is_first = False
 		start_time = records[str(index)]["Start_time"][0:5]
 		end_time = records[str(index)]["End_time"][0:5]
-		during = during(records[str(index)]["End_time"], records[str(index)]["Start_time"])
+		during_var = during(records[str(index)]["End_time"], records[str(index)]["Start_time"])
 		percentage = round(during / datetime.timedelta(days=1) * 100, 2)
 		print(f'  |   {records[str(index)]["Type"]}')
 		print(f'  |     Start time - {start_time}')
 		print(f'  |     End time - {end_time}')
-		print(f'  |     During - {during}')
+		print(f'  |     During - {during_var}')
 		print(f'  |     Percentage - {percentage}% of 24H')
 		print("   ---------------------------------------------------")
 	print("Press any key to return to the main menu: ")
